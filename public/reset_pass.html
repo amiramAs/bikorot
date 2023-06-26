@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="./public/reset-pass.js"></script>
+    <link rel="stylesheet" href="./public/style.css">
+</head>
+
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <div id="app"><input type="password" v-model="pass" placeholder="הכנס סיסמה" /><input type="password" v-model="passAgain" placeholder="הכנס סיסמה שוב" /><button v-on:click="send(pass, passAgain,resetLink)">אפס סיסמה</button></div>
+    <script>
+        new Vue({
+            data() {
+                return {
+                    pass: null,
+                    passAgain: null,
+                    queryString,
+                    urlParams,
+                    resetLink
+                }
+            },
+            mounted() {
+                this.queryString = window.location.search;
+                this.urlParams = new URLSearchParams(this.queryString);
+                this.resetLink = this.urlParams.get('resetLink');
+            },
+            methods: {
+                send(pass, passAgain, resetLink) {
+                    if (pass === passAgain && pass != null) {
+                        fetch("/student/reset-password", {
+                                body: JSON.stringify({
+                                    pass,
+                                    resetLink
+                                }),
+                                method: "PUT",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                },
+                            })
+                            .then((response) => response.json()).then((data) => {
+                                if (data.message === "ok") window.alert("הסיסמה שוחזרה בהצלחה");
+                                else if (data.error === "jwt expired") window.alert("תוקף הקישור נגמר");
+                                else if (data.error === "invalid signature") window.alert("הקישור אינו תקין");
+                                else window.alert("לא הצלחנו לשחזר את הסיסמה, נסה שוב בהמשך");
+                            });
+                    } else window.alert("הסיסמאות אינם תואמות")
+                },
+            },
+        }).$mount('#app')
+    </script>
+</body>
+
+</html>
