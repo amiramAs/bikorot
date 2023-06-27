@@ -3,9 +3,11 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
+console.log(process.env.secret)
+
 module.exports = (app) => {
     app.use(session({
-        secret: process.env.secret,
+        secret: "nkn39bs",
         resave: false,
         saveUninitialized: true,
         cookie: {
